@@ -1,5 +1,9 @@
 ChipAmount = int
 
+class Error(Exception):
+    """Base class for exceptions in this project"""
+    pass
+
 class Blinds:
     small: ChipAmount
     big: ChipAmount

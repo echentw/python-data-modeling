@@ -1,10 +1,17 @@
 from table import Table
 from event import (
     Event,
-    PlayerJoinEvent,
-    PlayerLeaveEvent
+    TableEvent,
+    PlayerJoin,
+    PlayerLeave,
+    PlayerAction,
+    Fold,
+    Check,
+    Call,
+    Bet,
+    Raise
 )
-from misc import ChipAmount, Blinds
+from misc import ChipAmount, Blinds, Error
 
 
 class Game:
@@ -16,13 +23,23 @@ class Game:
         self.table = Table()
 
     def receive(self, event: Event):
-        if isinstance(event, PlayerJoinEvent):
+        if isinstance(event, TableEvent):
+            self.handleTableEvent(event)
+        elif isinstance(event, PlayerAction):
+            self.handlePlayerAction(event)
+        else:
+            raise Error(f'unknown Event: {event}')
+
+    def handleTableEvent(self, event: TableEvent):
+        if isinstance(event, PlayerJoin):
             self.table.player_join(event.player, event.seat, event.buyin)
-        elif isinstance(event, PlayerLeaveEvent):
+        elif isinstance(event, PlayerLeave):
             self.table.player_leave(event.player)
         else:
-            # TODO: raise exception
-            pass
+            raise Error(f'unknown TableEvent: {event}')
+
+    def handlePlayerAction(self, action: PlayerAction):
+        raise Error(f'unknown PlayerAction: {action}')
 
     def __repr__(self):
         return f'{{blinds: {self.blinds}, table: {self.table}}}'

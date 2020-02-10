@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Dict, Optional
 
 from player import Player
-from misc import ChipAmount
+from misc import ChipAmount, Error
 
 
 class Table:
@@ -25,18 +25,19 @@ class Table:
 
     def player_join(self, player: Player, seat: Seat, buyin: ChipAmount):
         if self.seating[seat] is not None:
-            # TODO: throw an exception
-            pass
+            raise Error(f'{player} cannot sit in {seat} because it is occupied by {self.seating[seat]}')
         else:
             self.seating[seat] = player
             self.stacks[player] = buyin
 
     def player_leave(self, player: Player):
-        self.stacks.pop(player, None)
-        for seat, seated_player in self.seating.items():
-            if seated_player == player:
+        seats = [seat for seat, seated_player in self.seating.items() if seated_player == player]
+        if len(seats) == 0:
+            raise Error(f'{player} cannot leave because they are not seated')
+        else:
+            for seat in seats:
                 self.seating[seat] = None
-        # TODO: throw an exception if the player is not at the table
+            self.stacks.pop(player, None)
 
     def __repr__(self):
         table = [

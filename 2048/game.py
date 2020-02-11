@@ -192,11 +192,12 @@ class Game:
 
 
 def parse_input(user_input: str) -> Direction:
-    direction = Direction(user_input)
-    if direction is not None:
-        return direction
-    else:
-        raise Error(f'Unable to parse "{user_input}" into a Direction"')
+    try:
+        return Direction(user_input)
+    except ValueError as e:
+        raise Error(str(e))
+    except Exception as e:
+        raise e
 
 
 def main():
@@ -208,14 +209,18 @@ def main():
     user_input = input()
 
     while user_input != 'stop':
-        direction = parse_input(user_input)
-        game.handle_direction(direction)
-
-        print('------------------------------------')
-        print(game)
-        print('------------------------------------')
-
-        user_input = input()
+        try:
+            direction = parse_input(user_input)
+            game.handle_direction(direction)
+        except Error as e:
+            print(e)
+        except Exception as e:
+            raise e
+        finally:
+            print('------------------------------------')
+            print(game)
+            print('------------------------------------')
+            user_input = input()
 
 
 if __name__ == '__main__':
